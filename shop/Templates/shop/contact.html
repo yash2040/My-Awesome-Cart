@@ -1,0 +1,62 @@
+{% extends 'shop/basic.html' %}
+
+{% block title%} Contact Us{% endblock %}
+{% block contactactive %} active {% endblock contactactive %}
+{% block body %}
+{% for  message in messages %}
+  
+
+<div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+  <strong>Message:</strong> {{message}}
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{% endfor %}
+<div class="container my-5">
+    <h3>Write your Query here.</h3>
+<form action="/shop/contact/" method="post">{% csrf_token %}
+  <div class="form-group my-4">
+    <label for="name">Name</label>
+    <input type="text" class="form-control" id="name" name="name">
+  </div>
+    <div class="form-group my-4">
+    <label for="email">Email address</label>
+    <input type="email" class="form-control" id="email" placeholder="name@example.com" name="email">
+  </div>
+    <div class="form-group my-4">
+    <label for="phone">Phone Number</label>
+    <input type="tel" class="form-control" id="phone" name="phone">
+  </div>
+
+
+  <div class="form-group">
+    <label for="exampleFormControlTextarea1">Write Your Query</label>
+    <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="desc"></textarea>
+  </div>
+    <div class="container">
+    <button type="submit" class="btn btn-success">Submit</button>
+    </div>
+</form>
+</div>
+
+{% endblock %}
+{% block js %}
+<script>
+
+// Find out the cart items from localStorage
+if (localStorage.getItem('cart') == null) {
+    var cart = {};
+} else {
+    cart = JSON.parse(localStorage.getItem('cart'));
+
+    let cnt=0;
+  for(var item in cart)
+  {
+    cnt=cnt+cart[item][0];
+  }
+  console.log(cnt);
+  document.getElementById('cart').innerHTML = cnt;
+}
+</script>
+{% endblock %}

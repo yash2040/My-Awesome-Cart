@@ -1,6 +1,6 @@
 from django.db import models
-
-
+from django.contrib.auth.models import User
+import uuid
 # Create your models here.
 class Product(models.Model):
     product_id = models.AutoField
@@ -49,3 +49,7 @@ class OrderUpdate(models.Model):
 
     def __str__(self):
         return self.update_desc[0:35] + "               order-id" + str(self.order_id) + " " + str(self.timestamp)
+
+class ExtendedUser(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    userUuid=models.UUIDField(primary_key = True,default = uuid.uuid4, editable = False) 

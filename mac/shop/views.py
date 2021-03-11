@@ -3,15 +3,17 @@ from .models import Product,Contact,Orders,OrderUpdate
 from django.contrib.auth.models import User
 from math import ceil
 from django.contrib import messages
-from django.http import HttpResponse
+from django.http import HttpResponse,HttpResponseRedirect
 from Paytm import checksum
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings as conf_settings
-
+from .models import ExtendedUser
 import json
 Email="######"
 MERCHANT_KEY = 'Q2xCvdEs7Q3PeQvw'
+
 def index(request):
+
     if request.user.is_authenticated:
         pass
     else:
@@ -94,7 +96,6 @@ def search(request):
     else:
         return redirect(conf_settings.BASE_URL_LOCAL+"/loginuser")
     query=request.GET.get('search')
-    print(query)
     allProds = []
     catprods = Product.objects.values('category', 'id')
     cats = {item['category'] for item in catprods}
@@ -119,7 +120,6 @@ def productView(request, myid):
     else:
         return redirect(conf_settings.BASE_URL_LOCAL+"/loginuser")
     product = Product.objects.filter(id=myid)
-
 
     return render(request, 'shop/prodView.html', {'product':product[0]})
 
@@ -154,7 +154,7 @@ def checkout(request):
             'INDUSTRY_TYPE_ID': 'Retail',
             'WEBSITE': 'WEBSTAGING',
             'CHANNEL_ID': 'WEB',
-            'CALLBACK_URL': 'http://127.0.0.1:8000/shop/handlerequest/',
+            'CALLBACK_URL': conf_settings.BASE_URL_LOCAL+'/shop/handlerequest/',
 
         }
         param_dict['CHECKSUMHASH'] = checksum.generate_checksum(param_dict, MERCHANT_KEY)
@@ -186,4 +186,14 @@ def handlerequest(request):
             OrderUpdate.objects.filter(order_id=id).delete()
             Orders.objects.filter(order_id=id).delete()
             print('order was not successful because ' + response_dict['RESPMSG'])
-    return render(request, 'shop/paymentstatus.html', {'response': response_dict})
+    response= HttpResponseRedirect(conf_settings.BASE_URL_LOCAL+'/shop/paymentstatus?id='+response_dict['ORDERID']+'&respcode='+response_dict['RESPCODE']+'&respmsg='+response_dict['RESPMSG'])
+    return response
+def paymentstatus(request):
+    orderid=request.GET['id']
+    respcode=request.GET['respcode']
+    respmsg=request.GET['respmsg']
+    if respcode=="01":
+        messages.success(request,"Your order has been Placed!. Use order id "+orderid+" to track your order")
+    else:
+        messages.error(request,"Transaction failed because "+respmsg)
+    return render(request,'shop/paymentstatus.html')

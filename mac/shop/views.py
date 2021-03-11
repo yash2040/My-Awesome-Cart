@@ -6,16 +6,16 @@ from django.contrib import messages
 from django.http import HttpResponse
 from Paytm import checksum
 from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings as conf_settings
 
 import json
 Email="######"
 MERCHANT_KEY = 'Q2xCvdEs7Q3PeQvw'
 def index(request):
-    print(request.user)
     if request.user.is_authenticated:
         pass
     else:
-        return redirect("http://localhost:8000/loginuser")
+        return redirect(conf_settings.BASE_URL_LOCAL+"/loginuser")
     allProds = []
     catprods = Product.objects.values('category', 'id')
     cats = {item['category'] for item in catprods}
@@ -28,9 +28,17 @@ def index(request):
     return render(request, 'shop/index.html', params)
 
 def about(request):
+    if request.user.is_authenticated:
+        pass
+    else:
+        return redirect(conf_settings.BASE_URL_LOCAL+"/loginuser")
     return render(request, 'shop/about.html')
 
 def contact(request):
+    if request.user.is_authenticated:
+        pass
+    else:
+        return redirect(conf_settings.BASE_URL_LOCAL+"/loginuser")
     thank=False
     if request.method=="POST":
         name=request.POST.get('name','')
@@ -49,6 +57,10 @@ def contact(request):
     return render(request, 'shop/contact.html',{'thank': thank})
 
 def tracker(request):
+    if request.user.is_authenticated:
+        pass
+    else:
+        return redirect(conf_settings.BASE_URL_LOCAL+"/loginuser")
     global response
     if request.method == "POST":
         orderId = request.POST.get('orderId', '')
@@ -69,10 +81,18 @@ def tracker(request):
 
     return render(request, 'shop/tracker.html')
 def searchmatch(query,item):
+    if request.user.is_authenticated:
+        pass
+    else:
+        return redirect(conf_settings.BASE_URL_LOCAL+"/loginuser")
     if query.lower() in item.desc.lower() or query.lower() in item.product_name.lower() or query.lower() in item.category.lower():
         return True
     return False
 def search(request):
+    if request.user.is_authenticated:
+        pass
+    else:
+        return redirect(conf_settings.BASE_URL_LOCAL+"/loginuser")
     query=request.GET.get('search')
     print(query)
     allProds = []
@@ -94,13 +114,20 @@ def search(request):
 
 def productView(request, myid):
     # Fetch the product using the id
+    if request.user.is_authenticated:
+        pass
+    else:
+        return redirect(conf_settings.BASE_URL_LOCAL+"/loginuser")
     product = Product.objects.filter(id=myid)
 
 
     return render(request, 'shop/prodView.html', {'product':product[0]})
 
 def checkout(request):
-    thank1=False
+    if request.user.is_authenticated:
+        pass
+    else:
+        return redirect(conf_settings.BASE_URL_LOCAL+"/loginuser")
     if request.method == "POST":
         items_json = request.POST.get('itemsJson', '')
         amount=request.POST.get('amount','')
@@ -140,7 +167,6 @@ def handlerequest(request):
     checksum1="#####"
     id=0
     for i in form.keys():
-        print(i,form[i])
         response_dict[i] = form[i]
         if i == 'CHECKSUMHASH':
             checksum1 = form[i]
@@ -155,7 +181,6 @@ def handlerequest(request):
             for i in updates:
                 i.update_desc="Order has been Placed"
                 i.save()
-
             print('order successful')
         else:
             OrderUpdate.objects.filter(order_id=id).delete()

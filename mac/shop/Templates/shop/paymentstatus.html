@@ -7,9 +7,8 @@
 
         {% if response.RESPCODE == '01' %}
         <h2>Your Payment is Successful. Use order id: {{response.ORDERID}} to track your order</h2>
-        ORDER SUCCESS
         {% else %}
-        Your Payment was Unsuccessful
+        Your Payment was Unsuccessful. {{response.RESPMSG}}
         {% endif%}
 
     </div>

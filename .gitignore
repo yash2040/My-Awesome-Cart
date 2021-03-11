@@ -1,0 +1,7 @@
+.idea*
+mac/mac/__pycache*
+mac/media*
+mac/Paytm/__pycache*
+*pycache*
+*migrations*
+*static*

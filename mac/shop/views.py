@@ -84,10 +84,6 @@ def tracker(request):
 
     return render(request, 'shop/tracker.html')
 def searchmatch(query,item):
-    if request.user.is_authenticated:
-        pass
-    else:
-        return redirect(conf_settings.BASE_URL_LOCAL+"/loginuser")
     if query.lower() in item.desc.lower() or query.lower() in item.product_name.lower() or query.lower() in item.category.lower():
         return True
     return False

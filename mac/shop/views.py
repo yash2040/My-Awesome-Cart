@@ -18,6 +18,7 @@ def index(request):
         pass
     else:
         return redirect(conf_settings.BASE_URL_LOCAL+"/loginuser")
+    print(request.user)
     allProds = []
     catprods = Product.objects.values('category', 'id')
     cats = {item['category'] for item in catprods}
@@ -140,7 +141,7 @@ def checkout(request):
         zip_code = request.POST.get('zip_code', '')
         phone = request.POST.get('phone','')
         order = Orders(items_json=items_json, name=name, email=email, address=address, city=city,
-                       state=state, zip_code=zip_code, phone=phone,amount=amount)
+                       state=state, zip_code=zip_code, phone=phone,amount=amount,user=request.user)
         order.save()
         update=OrderUpdate(order_id=order.order_id,update_desc="Order Not Placed")
         update.save()
@@ -186,9 +187,18 @@ def handlerequest(request):
             OrderUpdate.objects.filter(order_id=id).delete()
             Orders.objects.filter(order_id=id).delete()
             print('order was not successful because ' + response_dict['RESPMSG'])
+    else:
+        OrderUpdate.objects.filter(order_id=id).delete()
+        Orders.objects.filter(order_id=id).delete()
+        print('order was not successful because ' + response_dict['RESPMSG'])
     response= HttpResponseRedirect(conf_settings.BASE_URL_LOCAL+'/shop/paymentstatus?id='+response_dict['ORDERID']+'&respcode='+response_dict['RESPCODE']+'&respmsg='+response_dict['RESPMSG'])
     return response
+
 def paymentstatus(request):
+    if request.user.is_authenticated:
+        pass
+    else:
+        return redirect(conf_settings.BASE_URL_LOCAL+"/loginuser")
     orderid=request.GET['id']
     respcode=request.GET['respcode']
     respmsg=request.GET['respmsg']
@@ -196,4 +206,5 @@ def paymentstatus(request):
         messages.success(request,"Your order has been Placed!. Use order id "+orderid+" to track your order")
     else:
         messages.error(request,"Transaction failed because "+respmsg)
+
     return render(request,'shop/paymentstatus.html')

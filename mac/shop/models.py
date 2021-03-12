@@ -28,8 +28,11 @@ class Contact(models.Model):
         return self.user_name + "                 " + self.user_email
 
 
+def get_default_user():
+    return User.objects.get(username="yash2040")
 class Orders(models.Model):
     order_id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User,on_delete=models.CASCADE,default="")
     items_json = models.CharField(max_length=5000, default="")
     amount=models.IntegerField(default=0)
     name = models.CharField(max_length=90, default="")
@@ -39,7 +42,6 @@ class Orders(models.Model):
     state = models.CharField(max_length=111, default="")
     zip_code = models.CharField(max_length=111, default="")
     phone = models.CharField(max_length=111, default="")
-
 
 class OrderUpdate(models.Model):
     update_id = models.AutoField(primary_key=True)
